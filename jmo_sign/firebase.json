@@ -1,0 +1,1 @@
+{"flutter":{"platforms":{"android":{"default":{"projectId":"jmo-sign","appId":"1:817610666729:android:a902d8229bbfd1dcb43678","fileOutput":"android/app/google-services.json"}},"dart":{"lib/firebase_options.dart":{"projectId":"jmo-sign","configurations":{"android":"1:817610666729:android:a902d8229bbfd1dcb43678","ios":"1:817610666729:ios:f124b4d1a9d8166bb43678"}}}}}}

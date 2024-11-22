@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "817610666729",
+    "project_id": "jmo-sign",
+    "storage_bucket": "jmo-sign.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:817610666729:android:a902d8229bbfd1dcb43678",
+        "android_client_info": {
+          "package_name": "com.example.jmo_sign"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBAAZlTrg6Rv8aKO5rwADPY06Y4XAokh9Q"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
