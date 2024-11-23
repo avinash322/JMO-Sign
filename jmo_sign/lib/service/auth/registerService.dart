@@ -3,7 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:jmo_sign/view/auth/login.dart';
 
-import '../../component/AlertDialog.dart';
+import '../../component/alertDialog.dart';
 
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;

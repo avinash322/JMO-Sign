@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import 'package:jmo_sign/model/user.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class AuthService {
   final firebase_auth.FirebaseAuth _auth = firebase_auth.FirebaseAuth.instance;
@@ -16,13 +17,19 @@ class AuthService {
       firebase_auth.User? firebaseUser = userCredential.user;
 
       if (firebaseUser != null) {
+        DocumentSnapshot userDoc = await FirebaseFirestore.instance
+            .collection('User')
+            .doc(firebaseUser.uid)
+            .get();
+
         UserData userData = UserData(
           id: firebaseUser.uid,
           email: firebaseUser.email ?? '',
-          name: firebaseUser.displayName ?? "",
-          attendanceIn: firebaseUser.displayName ?? "",
-          attendanceOut: firebaseUser.displayName ?? "",
+          name: userDoc['name'] ?? '',
+          attendanceIn: userDoc['attendance_in'] ?? '',
+          attendanceOut: userDoc['attendance_out'] ?? '',
         );
+
         return userData;
       } else {
         return null;

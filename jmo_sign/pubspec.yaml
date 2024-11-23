@@ -45,6 +45,15 @@ dependencies:
   flutter_launcher_icons: ^0.13.1
   flutter_spinkit: ^5.2.1
   skeletonizer:
+  google_nav_bar:
+  sidebarx:
+  signature:
+  pdf:
+  printing:
+  flutter_pdfview:
+  syncfusion_flutter_pdfviewer:
+  pdf_manipulator:
+  pdf_merger:
 
 dev_dependencies:
   flutter_test:
