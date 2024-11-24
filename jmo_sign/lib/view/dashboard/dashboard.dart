@@ -29,6 +29,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     ];
 
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: pages[selectedIndex],
       bottomNavigationBar: GNav(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,

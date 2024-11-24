@@ -4,8 +4,12 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:jmo_sign/model/user.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 
+import '../../component/button.dart';
 import '../../component/circularProgressDashboard.dart';
 import '../../component/glassmorphismContainer.dart';
+import '../../component/textfield.dart';
+import '../../model/document.dart';
+import '../../service/auth/homeService.dart';
 
 class Homecreen extends StatefulWidget {
   final UserData userData;
@@ -17,6 +21,266 @@ class Homecreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<Homecreen> {
+  final TextEditingController titleController = TextEditingController();
+
+  String? jumlahauthor;
+
+  String? selectedauthor1;
+  String? selectedauthor2;
+  String? selectedauthor3;
+
+  bool isChecked = false;
+  bool isSubmitDocument = false;
+  bool isloading = false;
+
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
+  final HomeService _homeService = HomeService();
+  List<String> userNamesList = [];
+
+  @override
+  void initState() {
+    super.initState();
+    fetchUserNames();
+  }
+
+  Future<void> fetchUserNames() async {
+    List<String> names = await _homeService.fetchUserNames(context: context);
+    setState(() {
+      userNamesList = names;
+    });
+  }
+
+  void submitDocumentData() async {
+    FocusScope.of(context).unfocus();
+
+    setState(() {
+      isloading = true;
+    });
+    _homeService.SubmitDocument(
+        userData: widget.userData,
+        title: titleController.text,
+        target: widget.userData.name,
+        author1: widget.userData.name,
+        author2: selectedauthor1 ?? "",
+        author3: selectedauthor2 ?? "",
+        context: context);
+
+    setState(() {
+      isloading = false;
+    });
+  }
+
+  void showCustomModal() {
+    showModalBottomSheet(
+      showDragHandle: true,
+      context: context,
+      isScrollControlled:
+          true, // Agar modal bisa menggunakan seluruh layar jika perlu
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (BuildContext context, setModalState) {
+            return Container(
+              height: MediaQuery.of(context).size.height *
+                  0.8, // Sesuaikan dengan ukuran layar
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        'Make a New Document Signing',
+                        style: GoogleFonts.poppins(
+                            textStyle: TextStyle(
+                                color: Colors.black,
+                                fontSize: 24,
+                                fontWeight: FontWeight.w500)),
+                        textAlign: TextAlign.center,
+                      ),
+                      CustomTextField(
+                        controller: titleController,
+                        labelText: 'Judul Dokumen',
+                        hintText: 'Judul Dokumen',
+                        keyboardType: TextInputType.text,
+                      ),
+                      SizedBox(height: 10),
+                      // Checkbox untuk memilih apakah akan kirim ke orang lain
+                      CheckboxListTile(
+                        title: Text('Kirim ke orang lain juga?'),
+                        value: isChecked,
+                        onChanged: (bool? value) {
+                          // Gunakan setModalState untuk memperbarui status di dalam modal
+                          setModalState(() {
+                            isChecked = value ?? false;
+                          });
+                        },
+                      ),
+                      SizedBox(height: 10),
+
+                      // Dropdown hanya muncul jika checkbox dicentang
+                      isChecked
+                          ? Column(
+                              children: [
+                                DropdownButtonFormField<String>(
+                                  dropdownColor: Color(0xFFECFFDC),
+                                  isExpanded: false,
+                                  decoration: const InputDecoration(
+                                    border: OutlineInputBorder(),
+                                  ),
+                                  icon: Icon(CupertinoIcons
+                                      .person_2_square_stack_fill),
+                                  elevation: 5,
+                                  hint: Text('Pilih Pilihan'),
+                                  value: jumlahauthor,
+                                  onChanged: (String? newValue) {
+                                    setModalState(() {
+                                      jumlahauthor = newValue;
+                                      selectedauthor1 = null;
+                                      selectedauthor2 = null;
+                                      // Update nilai dropdown
+                                    });
+                                  },
+                                  items: [
+                                    '1 Orang',
+                                    '2 Orang',
+                                  ].map<DropdownMenuItem<String>>(
+                                      (String value) {
+                                    return DropdownMenuItem<String>(
+                                      value: value,
+                                      child: Text(
+                                          value), // Tampilkan nama pengguna
+                                    );
+                                  }).toList(),
+                                ),
+                                SizedBox(height: 10),
+                                if (jumlahauthor == "1 Orang") ...[
+                                  DropdownButtonFormField<String>(
+                                    dropdownColor: Color(0xFFECFFDC),
+                                    isExpanded: false,
+                                    decoration: const InputDecoration(
+                                      border: OutlineInputBorder(),
+                                    ),
+                                    icon: Icon(CupertinoIcons.person),
+                                    elevation: 5,
+                                    hint: Text('Pilih Author'),
+                                    value: selectedauthor1,
+                                    onChanged: (String? newValue) {
+                                      setModalState(() {
+                                        selectedauthor1 = newValue;
+                                      });
+                                    },
+                                    items: userNamesList
+                                        .where((String value) =>
+                                            value != widget.userData.name)
+                                        .map<DropdownMenuItem<String>>(
+                                            (String value) {
+                                      return DropdownMenuItem<String>(
+                                        value: value,
+                                        child: Text(
+                                            value), // Tampilkan nama pengguna
+                                      );
+                                    }).toList(),
+                                  ),
+                                ] else if (jumlahauthor == "2 Orang") ...[
+                                  DropdownButtonFormField<String>(
+                                    dropdownColor: Color(0xFFECFFDC),
+                                    isExpanded: false,
+                                    decoration: const InputDecoration(
+                                      border: OutlineInputBorder(),
+                                    ),
+                                    icon: Icon(CupertinoIcons.person),
+                                    elevation: 5,
+                                    hint: Text('Pilih Author'),
+                                    value: selectedauthor1,
+                                    onChanged: (String? newValue) {
+                                      setModalState(() {
+                                        selectedauthor1 =
+                                            newValue; // Update nilai dropdown
+                                      });
+                                    },
+                                    items: userNamesList
+                                        .where((String value) =>
+                                            value != selectedauthor2 &&
+                                            value != widget.userData.name)
+                                        .map<DropdownMenuItem<String>>(
+                                            (String value) {
+                                      return DropdownMenuItem<String>(
+                                        value: value,
+                                        child: Text(
+                                            value), // Tampilkan nama pengguna
+                                      );
+                                    }).toList(),
+                                  ),
+                                  SizedBox(height: 10),
+                                  DropdownButtonFormField<String>(
+                                    dropdownColor: Color(0xFFECFFDC),
+                                    isExpanded: false,
+                                    decoration: const InputDecoration(
+                                      border: OutlineInputBorder(),
+                                    ),
+                                    icon: Icon(CupertinoIcons.person_2),
+                                    elevation: 5,
+                                    hint: Text('Pilih Author ke-2'),
+                                    value: selectedauthor2,
+                                    onChanged: (String? newValue) {
+                                      setModalState(() {
+                                        selectedauthor2 =
+                                            newValue; // Update nilai dropdown
+                                      });
+                                    },
+                                    items: userNamesList
+                                        .where((String value) =>
+                                            value != selectedauthor1 &&
+                                            value != widget.userData.name)
+                                        .map<DropdownMenuItem<String>>(
+                                            (String value) {
+                                      return DropdownMenuItem<String>(
+                                        value: value,
+                                        child: Text(
+                                            value), // Tampilkan nama pengguna
+                                      );
+                                    }).toList(),
+                                  ),
+                                ],
+                              ],
+                            )
+                          : Container(),
+                      SizedBox(height: 10),
+                      CustomElevatedButton(
+                        text: isloading ? 'Loading...' : 'Submit',
+                        onPressed: () {
+                          if (_formKey.currentState!.validate()) {
+                            isSubmitDocument ? null : submitDocumentData();
+                          } else {}
+                        },
+                        color: Colors.green,
+                      ), // Jika checkbox tidak dicentang, tidak menampilkan dropdown
+                      SizedBox(height: 50),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
+        );
+      },
+    ).whenComplete(() {
+      // Reset semua nilai variabel saat modal ditutup
+      setState(() {
+        titleController.text = "";
+        jumlahauthor = null;
+        selectedauthor1 = null;
+        selectedauthor2 = null;
+        isChecked = false;
+      });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
@@ -372,9 +636,7 @@ class _HomeScreenState extends State<Homecreen> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // Tindakan yang diinginkan saat tombol ditekan
-        },
+        onPressed: showCustomModal,
         backgroundColor: Color(0xFF4682B4), // Warna latar belakang biru
         child: Icon(
           Icons.add, // Ikon plus

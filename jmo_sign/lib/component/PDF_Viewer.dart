@@ -16,8 +16,6 @@ class PDFScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final pdfBytes = base64Decode(pdfBase64);
 
-    print(pdfBytes);
-
     return Scaffold(
       appBar: AppBar(title: const Text("PDF Preview")),
       body: Center(

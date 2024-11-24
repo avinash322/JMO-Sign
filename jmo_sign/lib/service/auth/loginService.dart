@@ -26,8 +26,6 @@ class AuthService {
           id: firebaseUser.uid,
           email: firebaseUser.email ?? '',
           name: userDoc['name'] ?? '',
-          attendanceIn: userDoc['attendance_in'] ?? '',
-          attendanceOut: userDoc['attendance_out'] ?? '',
         );
 
         return userData;

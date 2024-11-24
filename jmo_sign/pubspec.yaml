@@ -53,7 +53,7 @@ dependencies:
   flutter_pdfview:
   syncfusion_flutter_pdfviewer:
   pdf_manipulator:
-  pdf_merger:
+  image:
 
 dev_dependencies:
   flutter_test:
