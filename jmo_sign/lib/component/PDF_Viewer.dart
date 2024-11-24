@@ -16,12 +16,16 @@ class PDFScreen extends StatefulWidget {
   final String pdfBase64;
   final UserData userData;
   final Document documentData;
+  final bool viewonly;
+  final String? imageBase64;
 
   const PDFScreen(
       {Key? key,
       required this.pdfBase64,
       required this.userData,
-      required this.documentData})
+      required this.documentData,
+      required this.viewonly,
+      this.imageBase64})
       : super(key: key);
 
   @override
@@ -69,7 +73,7 @@ class _PDFScreenState extends State<PDFScreen> {
         author3: author3 ?? "",
         context: context,
         documentId: widget.documentData.id,
-        image: "",
+        image: widget.imageBase64 ?? "",
         target: target,
         userData: widget.userData);
   }
@@ -80,12 +84,13 @@ class _PDFScreenState extends State<PDFScreen> {
       appBar: AppBar(
         title: const Text("PDF Preview"),
         actions: [
-          IconButton(
+          if (!widget.viewonly) // Menampilkan IconButton jika viewonly false
+            IconButton(
               icon:
                   Icon(CupertinoIcons.arrow_up_right_circle_fill), // Ikon pesan
-              onPressed: fetchDocumentNames // Menampilkan title dokumen
-
-              ),
+              onPressed:
+                  fetchDocumentNames, // Fungsi untuk menampilkan title dokumen
+            ),
         ],
       ),
       body: Center(

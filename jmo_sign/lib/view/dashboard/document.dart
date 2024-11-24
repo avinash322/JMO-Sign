@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:typed_data';
 import 'package:intl/intl.dart';
 
@@ -7,7 +8,9 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:jmo_sign/service/auth/documentService.dart';
 import 'package:sidebarx/sidebarx.dart';
+import 'package:pdf/widgets.dart' as pw; // Import untuk membuat PDF
 
+import '../../component/PDF_Viewer.dart';
 import '../../component/signingModal.dart';
 import '../../model/document.dart';
 import '../../model/user.dart';
@@ -169,6 +172,49 @@ class _DocumentScreenState extends State<DocumentScreen> {
           ),
         );
       },
+    );
+  }
+
+  Future<String> convertImageToPdfBase64(String base64Image) async {
+    // Dekode Base64 menjadi Uint8List
+    Uint8List imageBytes = base64Decode(base64Image);
+
+    // Buat dokumen PDF
+    final pdf = pw.Document();
+
+    // Menambahkan gambar ke dalam PDF
+    pdf.addPage(
+      pw.Page(
+        build: (pw.Context context) {
+          return pw.Image(
+            pw.MemoryImage(imageBytes), // Menggunakan gambar dari Base64
+            width: 500,
+            height: 500,
+          );
+        },
+      ),
+    );
+
+    // Simpan PDF dan konversi menjadi Base64
+    final pdfBytes = await pdf.save();
+    return base64Encode(pdfBytes); // Kembalikan hasil Base64 dari PDF
+  }
+
+  void navigateToPDFScreen(BuildContext context, Document document) async {
+    // Proses document.image menjadi PDF Base64
+    final pdfBase64 = await convertImageToPdfBase64(document.image);
+
+    // Navigasi ke PDFScreen dengan hasil PDF Base64
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => PDFScreen(
+          pdfBase64: pdfBase64,
+          documentData: document,
+          userData: widget.userData,
+          viewonly: true,
+        ),
+      ),
     );
   }
 
@@ -650,9 +696,16 @@ class _DocumentScreenState extends State<DocumentScreen> {
                                               ],
                                             ),
                                           ),
-                                          Icon(
-                                            Icons.download_for_offline_outlined,
-                                            color: Color(0xFF478778),
+                                          GestureDetector(
+                                            onTap: () {
+                                              navigateToPDFScreen(
+                                                  context, document);
+                                            },
+                                            child: Icon(
+                                              CupertinoIcons
+                                                  .doc_text_viewfinder,
+                                              color: Color(0xFF478778),
+                                            ),
                                           ),
                                         ],
                                       ),

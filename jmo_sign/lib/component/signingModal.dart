@@ -39,47 +39,82 @@ class _SignatureModalState extends State<SignatureModal> {
     penColor: Colors.black,
     exportBackgroundColor: Colors.white,
   );
+  late String combinedBase64;
 
   Future<void> _showPDFPreview(Uint8List signature) async {
     // Buat dokumen PDF
     final pdf = pw.Document();
+
+    // Menambahkan gambar ke dalam PDF
     pdf.addPage(
       pw.Page(
         build: (pw.Context context) {
-          return pw.Center(
-            child: pw.Image(
-              pw.MemoryImage(signature),
-              width: 200,
-              height: 100,
-            ),
+          return pw.Image(
+            pw.MemoryImage(signature),
+            width: 500,
+            height: 500,
           );
         },
       ),
     );
 
+    // Panggil generateAndNavigate untuk navigasi setelah PDF selesai dibuat
     generateAndNavigate(context, pdf, signature);
   }
 
   Future<void> generateAndNavigate(
-      BuildContext context, pw.Document pdf, signature) async {
+      BuildContext context, pw.Document pdf, Uint8List signature) async {
     final pdfBytes = await pdf.save();
+    final pdfBase64 = base64Encode(pdfBytes); // Base64 dari PDF
+    var signatureimg = signature;
 
-    final pdfBase64 = base64Encode(pdfBytes);
+    // Kondisi jika ada lebih dari satu gambar (signatures)
+    String finalPdfBase64 = pdfBase64; // Default jika hanya satu gambar
 
-    String stringbase = base64Encode(signature);
+    // Misalnya, jika ada lebih dari satu gambar
+    if (widget.documentData.target == widget.documentData.author2 ||
+        widget.documentData.target == widget.documentData.author3) {
+      // Gabungkan gambar menjadi satu PDF baru
+      String combinedBase64 = await combineImagesToBase64(
+        widget.documentData.image,
+        base64Encode(signature), // Gantilah dengan base64 gambar yang sesuai
+      );
+      signatureimg = base64Decode(combinedBase64);
 
-    String bytes2 = await combineImagesToBase64(stringbase, stringbase);
+      // Gabungkan gambar-gambar tersebut dalam PDF baru
 
-    // Memastikan context masih valid sebelum melakukan navigasi
+      final pdf = pw.Document();
+
+      // Menambahkan gambar ke dalam PDF
+      pdf.addPage(
+        pw.Page(
+          build: (pw.Context context) {
+            return pw.Image(
+              pw.MemoryImage(base64Decode(combinedBase64)),
+              width: 500,
+              height: 500,
+            );
+          },
+        ),
+      );
+      final pdfBytes = await pdf.save();
+      final pdfBase64 = base64Encode(pdfBytes);
+      finalPdfBase64 = pdfBase64;
+    }
+
+    // Navigasi ke PDFScreen dengan base64 dari PDF yang sudah diproses
     if (mounted) {
       Navigator.push(
         context,
         MaterialPageRoute(
-            builder: (context) => PDFScreen(
-                  pdfBase64: pdfBase64,
-                  documentData: widget.documentData,
-                  userData: widget.userData,
-                )),
+          builder: (context) => PDFScreen(
+            imageBase64: base64Encode(signatureimg),
+            pdfBase64: finalPdfBase64,
+            documentData: widget.documentData,
+            userData: widget.userData,
+            viewonly: false,
+          ),
+        ),
       );
     } else {
       print("Context is not valid, cannot navigate.");
@@ -91,6 +126,7 @@ class _SignatureModalState extends State<SignatureModal> {
     Uint8List bytes1 = base64Decode(base64Image1);
     Uint8List bytes2 = base64Decode(base64Image2);
 
+    // Decode gambar dari byte array
     ui.Image image1 = await decodeImageFromList(bytes1);
     ui.Image image2 = await decodeImageFromList(bytes2);
 
@@ -100,24 +136,18 @@ class _SignatureModalState extends State<SignatureModal> {
     double width = image1.width.toDouble();
     double height = image1.height.toDouble() + image2.height.toDouble();
 
+    // Gambar pertama
     canvas.drawImage(image1, Offset(0, 0), Paint());
 
+    // Gambar kedua ditempatkan setelah gambar pertama
     canvas.drawImage(image2, Offset(0, image1.height.toDouble()), Paint());
 
     final picture = recorder.endRecording();
     final combinedImage = await picture.toImage(width.toInt(), height.toInt());
 
+    // Convert combined image to base64
     final base64Image = await imageToBase64(combinedImage);
-
-    developer.log(base64Image);
-
-    ByteData? byteData =
-        await combinedImage.toByteData(format: ui.ImageByteFormat.png);
-    if (byteData == null) {
-      throw Exception("Failed to get byte data from image");
-    }
-
-    return base64Encode(byteData.buffer.asUint8List());
+    return base64Image;
   }
 
   Future<String> imageToBase64(ui.Image image) async {
