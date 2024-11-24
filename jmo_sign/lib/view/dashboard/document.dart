@@ -73,10 +73,10 @@ class _DocumentScreenState extends State<DocumentScreen> {
       ),
       builder: (BuildContext context) {
         return Container(
-          height: 500,
+          height: 350,
           padding: EdgeInsets.all(16.0),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Text("Document Timeline",
                   style: GoogleFonts.poppins(
@@ -87,6 +87,84 @@ class _DocumentScreenState extends State<DocumentScreen> {
                     ),
                   )),
               const SizedBox(height: 16),
+              Container(
+                width: 30,
+                height: 30,
+                decoration:
+                    BoxDecoration(shape: BoxShape.circle, color: Colors.amber),
+              ),
+              Text("Document Signing Created",
+                  style: GoogleFonts.poppins(
+                    textStyle: TextStyle(
+                      color: Colors.black,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  )),
+              Container(
+                width: 2,
+                height: 40, // Adjust height based on how far you want the line
+                color: Colors.amber,
+              ),
+              document.target == document.author2
+                  ? Column(
+                      children: [
+                        const SizedBox(height: 5),
+                        SpinKitRing(
+                          color: Color(0xFF87CEEB),
+                          size: 30,
+                        ),
+                        Text("Waiting for Author 2 Signing",
+                            style: GoogleFonts.poppins(
+                              textStyle: TextStyle(
+                                color: Colors.black,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            )),
+                      ],
+                    )
+                  : document.target == document.author3
+                      ? Column(
+                          children: [
+                            const SizedBox(height: 5),
+                            Container(
+                              width: 30,
+                              height: 30,
+                              decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: Color(0xFF87CEEB)),
+                            ),
+                            Text("Author 2 Done Signing",
+                                style: GoogleFonts.poppins(
+                                  textStyle: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                )),
+                            Container(
+                              width: 2,
+                              height:
+                                  40, // Adjust height based on how far you want the line
+                              color: Color(0xFF87CEEB),
+                            ),
+                            const SizedBox(height: 5),
+                            SpinKitRing(
+                              color: Color(0xFF9FE2BF),
+                              size: 30,
+                            ),
+                            Text("Waiting for Author 3 Signing",
+                                style: GoogleFonts.poppins(
+                                  textStyle: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                )),
+                          ],
+                        )
+                      : Container()
             ],
           ),
         );
@@ -347,7 +425,8 @@ class _DocumentScreenState extends State<DocumentScreen> {
                             // Filter data berdasarkan target
                             List filteredDocuments = snapshot.data!
                                 .where((document) =>
-                                    document.target != widget.userData.name)
+                                    document.target != widget.userData.name &&
+                                    document.target != "complete")
                                 .toList();
 
                             if (filteredDocuments.isEmpty) {
@@ -511,73 +590,75 @@ class _DocumentScreenState extends State<DocumentScreen> {
                               );
                             }
 
-                            return Column(
+                            return ListView(
+                              padding: EdgeInsets.all(16),
                               children: [
-                                ListView(
-                                  padding: EdgeInsets.all(16),
-                                  children: [
-                                    // Tampilkan daftar dokumen
-                                    ...filteredDocuments.map((document) {
-                                      return Card(
-                                        elevation: 4,
-                                        color: Color(0xFF9FE2BF),
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                        ),
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(16.0),
-                                          child: Row(
-                                            children: [
-                                              SpinKitWaveSpinner(
-                                                color: Color(0xFF478778),
-                                              ),
-                                              SizedBox(width: 10),
-                                              Expanded(
-                                                child: Column(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  children: [
-                                                    Text(
-                                                        document
-                                                            .title, // Tampilkan title dokumen
-                                                        style:
-                                                            GoogleFonts.poppins(
-                                                          textStyle: TextStyle(
-                                                            color: Colors.black,
-                                                            fontSize: 16,
-                                                            fontWeight:
-                                                                FontWeight.w700,
-                                                          ),
-                                                        )),
-                                                    SizedBox(height: 8),
-                                                    Text(
-                                                      "Date: ${DateFormat('dd-MM-yyyy').format(DateTime.parse(document.date))}",
-                                                      style:
-                                                          GoogleFonts.poppins(
-                                                        textStyle: TextStyle(
-                                                          color: Colors.black,
-                                                          fontSize: 12,
-                                                          fontWeight:
-                                                              FontWeight.normal,
-                                                        ),
-                                                      ),
-                                                    )
-                                                  ],
-                                                ),
-                                              ),
-                                              Icon(
-                                                Icons
-                                                    .download_for_offline_outlined,
-                                                color: Color(0xFF478778),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      );
-                                    }).toList(),
-                                  ],
+                                Text(
+                                  'Complete Signing',
+                                  style: GoogleFonts.poppins(
+                                    textStyle: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 30,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
                                 ),
+                                // Tampilkan daftar dokumen
+                                ...filteredDocuments.map((document) {
+                                  return Card(
+                                    elevation: 4,
+                                    color: Color(0xFF9FE2BF),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(16.0),
+                                      child: Row(
+                                        children: [
+                                          SpinKitWaveSpinner(
+                                            color: Color(0xFF478778),
+                                          ),
+                                          SizedBox(width: 10),
+                                          Expanded(
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                    document
+                                                        .title, // Tampilkan title dokumen
+                                                    style: GoogleFonts.poppins(
+                                                      textStyle: TextStyle(
+                                                        color: Colors.black,
+                                                        fontSize: 16,
+                                                        fontWeight:
+                                                            FontWeight.w700,
+                                                      ),
+                                                    )),
+                                                SizedBox(height: 8),
+                                                Text(
+                                                  "Date: ${DateFormat('dd-MM-yyyy').format(DateTime.parse(document.date))}",
+                                                  style: GoogleFonts.poppins(
+                                                    textStyle: TextStyle(
+                                                      color: Colors.black,
+                                                      fontSize: 12,
+                                                      fontWeight:
+                                                          FontWeight.normal,
+                                                    ),
+                                                  ),
+                                                )
+                                              ],
+                                            ),
+                                          ),
+                                          Icon(
+                                            Icons.download_for_offline_outlined,
+                                            color: Color(0xFF478778),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  );
+                                }).toList(),
                               ],
                             );
                           },

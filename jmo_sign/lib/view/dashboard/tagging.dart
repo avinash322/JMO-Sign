@@ -13,7 +13,7 @@ class TaggingScreen extends StatefulWidget {
 }
 
 class _TaggingScreenState extends State<TaggingScreen> {
-  LatLng _defaultLocation = const LatLng(-6.967196, 107.584270);
+  LatLng _defaultLocation = const LatLng(-6.233385, 106.821412);
   late MapController _mapController;
   double accuracy = 50;
   List<Marker> _markers = [];
@@ -41,15 +41,6 @@ class _TaggingScreenState extends State<TaggingScreen> {
         ),
       ),
     );
-    Future.delayed(Duration(milliseconds: 100), () {
-      _mapController.move(_defaultLocation, 17);
-    });
-  }
-
-  Future<void> _getHashMicroLocation() async {
-    setState(() {
-      _defaultLocation = const LatLng(-6.170725, 106.813360);
-    });
     Future.delayed(Duration(milliseconds: 100), () {
       _mapController.move(_defaultLocation, 17);
     });
@@ -191,7 +182,7 @@ class _TaggingScreenState extends State<TaggingScreen> {
                           width: 200,
                           height: 150,
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: Colors.grey[300],
                             borderRadius: BorderRadius.circular(10),
                             boxShadow: [
                               BoxShadow(
@@ -294,7 +285,7 @@ class _TaggingScreenState extends State<TaggingScreen> {
                           width: 200,
                           height: 150,
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: Colors.grey[300],
                             borderRadius: BorderRadius.circular(10),
                             boxShadow: [
                               BoxShadow(
@@ -433,10 +424,6 @@ class _TaggingScreenState extends State<TaggingScreen> {
                   accuracy = newValue ?? 50.0;
                 });
               },
-            ),
-            IconButton(
-              icon: Icon(Icons.location_city_outlined),
-              onPressed: _getHashMicroLocation,
             ),
             IconButton(
               icon: Icon(Icons.door_back_door_outlined),

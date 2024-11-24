@@ -1,9 +1,15 @@
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:jmo_sign/model/user.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:jmo_sign/view/auth/login.dart';
+import 'package:jmo_sign/view/dashboard/tagging.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:intl/intl.dart';
 
 import '../../component/button.dart';
 import '../../component/circularProgressDashboard.dart';
@@ -53,9 +59,13 @@ class _HomeScreenState extends State<Homecreen> {
     waitingForTheOthers: 0,
   );
 
+  String _locationMessage = "";
+
   @override
   void initState() {
     super.initState();
+    _checkLocationPermission();
+
     if (widget.userData.id != "") {
       fetchUserTask();
     }
@@ -317,6 +327,109 @@ class _HomeScreenState extends State<Homecreen> {
     });
   }
 
+  void _checkLocationPermission() async {
+    LocationPermission permission = await Geolocator.checkPermission();
+
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      _showAlertDialog();
+    } else {
+      _getCurrentLocation();
+    }
+  }
+
+  Future<void> _getCurrentLocation() async {
+    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+
+    if (!serviceEnabled) {
+      _showGPSAlert();
+    } else {
+      try {
+        Position position = await Geolocator.getCurrentPosition(
+            desiredAccuracy: LocationAccuracy.high);
+        setState(() {
+          _locationMessage =
+              "Lat: ${position.latitude}, Lon: ${position.longitude}";
+        });
+        print("koordinat:" + _locationMessage);
+
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        await prefs.setString('latitude', position.latitude.toString());
+        await prefs.setString('longitude', position.longitude.toString());
+      } catch (e) {
+        print("error" + e.toString());
+        _showGPSAlert();
+      }
+    }
+  }
+
+  void _showGPSAlert() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("GPS Not Enabled"),
+          content: Text("Please enable GPS to get the current location."),
+          actions: [
+            TextButton(
+              child: Text("Ok"),
+              onPressed: () {
+                Navigator.of(context).pop();
+                Geolocator.openLocationSettings().then((_) async {
+                  await Future.delayed(Duration(seconds: 2));
+                  bool serviceEnabled =
+                      await Geolocator.isLocationServiceEnabled();
+                  if (serviceEnabled) {
+                    _getCurrentLocation();
+                  } else {
+                    _showGPSAlert();
+                  }
+                });
+              },
+            ),
+            TextButton(
+              child: Text("Exit App"),
+              onPressed: () {
+                exit(0);
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showAlertDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Location Permission Denied"),
+          content: Text("Please enable location permission in settings."),
+          actions: [
+            TextButton(
+              child: Text("OK"),
+              onPressed: () {
+                Geolocator.openAppSettings();
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text("Cancel"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
@@ -548,7 +661,7 @@ class _HomeScreenState extends State<Homecreen> {
                               padding: const EdgeInsets.all(8.0),
                               child: Column(children: [
                                 Text(
-                                  '25',
+                                  DateFormat('d').format(DateTime.now()),
                                   style: GoogleFonts.poppins(
                                     textStyle: TextStyle(
                                       fontSize: 30,
@@ -558,7 +671,7 @@ class _HomeScreenState extends State<Homecreen> {
                                   ),
                                 ),
                                 Text(
-                                  'Fri',
+                                  DateFormat('E').format(DateTime.now()),
                                   style: GoogleFonts.poppins(
                                     textStyle: TextStyle(
                                       fontSize: 20,
@@ -584,26 +697,36 @@ class _HomeScreenState extends State<Homecreen> {
                                   child: Row(
                                     children: [
                                       Expanded(
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceEvenly,
-                                          children: [
-                                            Icon(
-                                              CupertinoIcons
-                                                  .square_arrow_right_fill,
-                                              color: Color(0xFF6495ED),
-                                            ),
-                                            Text(
-                                              'Clock In',
-                                              style: GoogleFonts.poppins(
-                                                textStyle: TextStyle(
-                                                  fontSize: 15,
-                                                  fontWeight: FontWeight.w600,
-                                                  color: Color(0xFFE35335),
-                                                ),
+                                        child: GestureDetector(
+                                          onTap: () {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      TaggingScreen()),
+                                            );
+                                          },
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceEvenly,
+                                            children: [
+                                              Icon(
+                                                CupertinoIcons
+                                                    .square_arrow_right_fill,
+                                                color: Color(0xFF6495ED),
                                               ),
-                                            )
-                                          ],
+                                              Text(
+                                                'Clock In',
+                                                style: GoogleFonts.poppins(
+                                                  textStyle: TextStyle(
+                                                    fontSize: 15,
+                                                    fontWeight: FontWeight.w600,
+                                                    color: Color(0xFFE35335),
+                                                  ),
+                                                ),
+                                              )
+                                            ],
+                                          ),
                                         ),
                                       ),
                                       Padding(
@@ -612,26 +735,35 @@ class _HomeScreenState extends State<Homecreen> {
                                         child: VerticalDivider(),
                                       ),
                                       Expanded(
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceEvenly,
-                                          children: [
-                                            Icon(
-                                              CupertinoIcons
-                                                  .square_arrow_left_fill,
-                                              color: Color(0xFF6495ED),
-                                            ),
-                                            Text(
-                                              'Clock Out',
-                                              style: GoogleFonts.poppins(
-                                                textStyle: TextStyle(
-                                                  fontSize: 15,
-                                                  fontWeight: FontWeight.w600,
-                                                  color: Color(0xFFE35335),
-                                                ),
+                                        child: GestureDetector(
+                                          onTap: () {
+                                            Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        TaggingScreen()));
+                                          },
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceEvenly,
+                                            children: [
+                                              Icon(
+                                                CupertinoIcons
+                                                    .square_arrow_left_fill,
+                                                color: Color(0xFF6495ED),
                                               ),
-                                            )
-                                          ],
+                                              Text(
+                                                'Clock Out',
+                                                style: GoogleFonts.poppins(
+                                                  textStyle: TextStyle(
+                                                    fontSize: 15,
+                                                    fontWeight: FontWeight.w600,
+                                                    color: Color(0xFFE35335),
+                                                  ),
+                                                ),
+                                              )
+                                            ],
+                                          ),
                                         ),
                                       ),
                                     ],
@@ -646,13 +778,16 @@ class _HomeScreenState extends State<Homecreen> {
                                         Icons.location_on,
                                         color: Colors.white,
                                       ),
-                                      Text(
-                                        'Office ,West Jakarta',
-                                        style: GoogleFonts.poppins(
-                                          textStyle: TextStyle(
-                                            fontSize: 15,
-                                            fontWeight: FontWeight.w600,
-                                            color: Colors.white,
+                                      Expanded(
+                                        child: Text(
+                                          overflow: TextOverflow.ellipsis,
+                                          _locationMessage,
+                                          style: GoogleFonts.poppins(
+                                            textStyle: TextStyle(
+                                              fontSize: 15,
+                                              fontWeight: FontWeight.w600,
+                                              color: Colors.white,
+                                            ),
                                           ),
                                         ),
                                       )

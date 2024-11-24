@@ -116,7 +116,8 @@ class AuthService {
           }
 
           // Jika user bukan target, tapi dia adalah salah satu dari author
-          if (target != userDoc['name'] &&
+          if (target != "complete" &&
+              target != userDoc['name'] &&
               (author1 == userDoc['name'] ||
                   author2 == userDoc['name'] ||
                   author3 == userDoc['name'])) {
@@ -124,12 +125,8 @@ class AuthService {
           }
 
           // Hitung total task (jika user ada di dokumen sebagai author atau target)
-          if (target == userDoc['name'] ||
-              author1 == userDoc['name'] ||
-              author2 == userDoc['name'] ||
-              author3 == userDoc['name']) {
-            totalTask++;
-          }
+
+          totalTask = needToSign + waitingForTheOthers;
         }
 
         UserData userData = UserData(
