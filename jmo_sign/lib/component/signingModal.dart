@@ -11,16 +11,22 @@ import 'dart:typed_data'; // Import untuk Uint8List
 import 'package:pdf/widgets.dart' as pw; // Import untuk membuat PDF
 import 'package:printing/printing.dart';
 
+import '../model/document.dart';
+import '../model/user.dart';
 import 'PDF_Viewer.dart'; // Import untuk menampilkan atau mencetak PDF
 
 class SignatureModal extends StatefulWidget {
   final Function(Uint8List?) onConfirm; // Callback untuk OK
   final VoidCallback? onCancel; // Callback untuk Cancel (opsional)
+  final UserData userData;
+  final Document documentData;
 
   const SignatureModal({
     Key? key,
     required this.onConfirm,
     this.onCancel,
+    required this.userData,
+    required this.documentData,
   }) : super(key: key);
 
   @override
@@ -69,7 +75,11 @@ class _SignatureModalState extends State<SignatureModal> {
       Navigator.push(
         context,
         MaterialPageRoute(
-            builder: (context) => PDFScreen(pdfBase64: pdfBase64)),
+            builder: (context) => PDFScreen(
+                  pdfBase64: pdfBase64,
+                  documentData: widget.documentData,
+                  userData: widget.userData,
+                )),
       );
     } else {
       print("Context is not valid, cannot navigate.");

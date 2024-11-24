@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:jmo_sign/model/user.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
+import 'package:jmo_sign/view/auth/login.dart';
 
 import '../../component/button.dart';
 import '../../component/circularProgressDashboard.dart';
@@ -10,6 +11,7 @@ import '../../component/glassmorphismContainer.dart';
 import '../../component/textfield.dart';
 import '../../model/document.dart';
 import '../../service/auth/homeService.dart';
+import '../../service/auth/loginService.dart';
 
 class Homecreen extends StatefulWidget {
   final UserData userData;
@@ -33,15 +35,48 @@ class _HomeScreenState extends State<Homecreen> {
   bool isSubmitDocument = false;
   bool isloading = false;
 
+  bool isloadingdashboard = false;
+
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   final HomeService _homeService = HomeService();
+  final AuthService _loginService = AuthService();
+
   List<String> userNamesList = [];
+
+  late UserData _userData = UserData(
+    id: '',
+    email: '',
+    name: '',
+    needToSign: 0,
+    totalTask: 0,
+    waitingForTheOthers: 0,
+  );
 
   @override
   void initState() {
     super.initState();
+    if (widget.userData.id != "") {
+      fetchUserTask();
+    }
+
     fetchUserNames();
+  }
+
+  Future<void> fetchUserTask() async {
+    // Menunggu hasil dari _homeService.refreshProfile
+    UserData? updatedUserData =
+        await _homeService.refreshTask(context, widget.userData.id);
+
+    // Pastikan updatedUserData tidak null sebelum mengupdate
+    if (updatedUserData != null) {
+      setState(() {
+        _userData = updatedUserData; // Mengupdate widget.userData
+      });
+    } else {
+      // Tindakan jika userData yang diperoleh adalah null
+      print("Gagal mendapatkan data pengguna.");
+    }
   }
 
   Future<void> fetchUserNames() async {
@@ -64,7 +99,8 @@ class _HomeScreenState extends State<Homecreen> {
         author1: widget.userData.name,
         author2: selectedauthor1 ?? "",
         author3: selectedauthor2 ?? "",
-        context: context);
+        context: context,
+        image: "");
 
     setState(() {
       isloading = false;
@@ -364,20 +400,19 @@ class _HomeScreenState extends State<Homecreen> {
                                       color: Colors.black12,
                                       borderRadius: BorderRadius.circular(50),
                                     ),
-                                    child: Icon(
-                                      Icons.notifications_outlined,
-                                      color: Colors.black,
-                                    ),
-                                  ),
-                                  Positioned(
-                                    right: 4,
-                                    top: 4,
-                                    child: Container(
-                                      width: 10,
-                                      height: 10,
-                                      decoration: BoxDecoration(
-                                        color: Colors.red,
-                                        shape: BoxShape.circle,
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        _loginService.signOut();
+                                        Navigator.pushReplacement(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  LoginScreen()),
+                                        );
+                                      },
+                                      child: Icon(
+                                        Icons.exit_to_app,
+                                        color: Colors.black,
                                       ),
                                     ),
                                   ),
@@ -402,7 +437,7 @@ class _HomeScreenState extends State<Homecreen> {
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
                             CircularProgressDashboard(
-                              number: 5,
+                              number: _userData.totalTask,
                             ),
                             Expanded(
                               child: Column(
@@ -427,7 +462,7 @@ class _HomeScreenState extends State<Homecreen> {
                                                     fontWeight:
                                                         FontWeight.bold))),
                                       ),
-                                      Text('4',
+                                      Text(_userData.needToSign.toString(),
                                           style: GoogleFonts.poppins(
                                               textStyle: TextStyle(
                                                   color: Colors.black,
@@ -457,7 +492,9 @@ class _HomeScreenState extends State<Homecreen> {
                                                     fontWeight:
                                                         FontWeight.bold))),
                                       ),
-                                      Text('1',
+                                      Text(
+                                          _userData.waitingForTheOthers
+                                              .toString(),
                                           style: GoogleFonts.poppins(
                                               textStyle: TextStyle(
                                                   color: Colors.black,

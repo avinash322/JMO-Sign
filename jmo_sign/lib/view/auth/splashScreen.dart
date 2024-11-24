@@ -1,5 +1,9 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:jmo_sign/view/auth/login.dart';
+
+import '../../service/auth/loginService.dart';
+import '../dashboard/dashboard.dart';
 
 class SplashScreen extends StatefulWidget {
   @override
@@ -7,6 +11,8 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
+  final AuthService _authService = AuthService();
+
   @override
   void initState() {
     super.initState();
@@ -16,12 +22,22 @@ class _SplashScreenState extends State<SplashScreen> {
   void _navigateToDashboard() async {
     // Simulasi waktu loading
     await Future.delayed(const Duration(seconds: 3));
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(
-        builder: (context) => LoginScreen(),
-      ),
-    );
+
+    // Mengecek status login dengan Firebase Authentication
+    User? user = FirebaseAuth.instance.currentUser;
+
+    if (user != null) {
+      // Jika pengguna sudah login, arahkan ke DashboardScreen
+      _authService.AutoLogin(user, context);
+    } else {
+      // Jika pengguna belum login, arahkan ke LoginScreen
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => LoginScreen(),
+        ),
+      );
+    }
   }
 
   @override

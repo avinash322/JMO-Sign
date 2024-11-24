@@ -28,8 +28,9 @@ class AuthService {
         'id': userId,
         'email': email,
         'name': name,
-        'attendance_in': '',
-        'attendance_out': '',
+        'total_task': 0,
+        'need_to_sign': 0,
+        'waiting_for_the_others': 0,
       });
 
       showCustomAlertDialogOneDialog(

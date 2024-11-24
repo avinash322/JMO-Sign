@@ -6,10 +6,81 @@ import 'package:jmo_sign/view/dashboard/home.dart';
 
 import '../../component/alertDialog.dart';
 import '../../model/document.dart';
+import '../../model/user.dart';
 import '../../view/dashboard/dashboard.dart';
 
 class HomeService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+  Future<UserData?> refreshTask(
+    context,
+    userid,
+  ) async {
+    try {
+      print(userid);
+      DocumentSnapshot userDoc =
+          await FirebaseFirestore.instance.collection('User').doc(userid).get();
+
+      QuerySnapshot querySnapshot =
+          await FirebaseFirestore.instance.collection('Document').get();
+
+      int needToSign = 0;
+      int waitingForTheOthers = 0;
+      int totalTask = 0;
+
+      // Iterasi setiap dokumen di koleksi
+      for (var doc in querySnapshot.docs) {
+        final documentData = doc.data() as Map<String, dynamic>;
+
+        final target = documentData['target'] ?? '';
+        final author1 = documentData['author_1'] ?? '';
+        final author2 = documentData['author_2'] ?? '';
+        final author3 = documentData['author_3'] ?? '';
+
+        // Jika user adalah target, tambahkan ke needToSign
+        if (target == userDoc['name']) {
+          needToSign++;
+        }
+
+        // Jika user bukan target, tapi dia adalah salah satu dari author
+        if (target != userDoc['name'] &&
+            (author1 == userDoc['name'] ||
+                author2 == userDoc['name'] ||
+                author3 == userDoc['name'])) {
+          waitingForTheOthers++;
+        }
+
+        // Hitung total task (jika user ada di dokumen sebagai author atau target)
+        if (target == userDoc['name'] ||
+            author1 == userDoc['name'] ||
+            author2 == userDoc['name'] ||
+            author3 == userDoc['name']) {
+          totalTask++;
+        }
+      }
+
+      UserData userData = UserData(
+        id: userDoc['id'] ?? '',
+        email: userDoc['email'] ?? '',
+        name: userDoc['name'] ?? '',
+        needToSign: needToSign,
+        totalTask: totalTask,
+        waitingForTheOthers: waitingForTheOthers,
+      );
+
+      return userData;
+    } catch (e) {
+      showCustomAlertDialogOneDialog(
+        context: context,
+        title: "An error occurred: $e",
+        onPressed: () {
+          Navigator.of(context).pop();
+        },
+      );
+      print("An error occurred: $e");
+      return null;
+    }
+  }
 
   // Fungsi untuk mengambil semua nama dari koleksi User
   Future<List<String>> fetchUserNames({required BuildContext context}) async {
@@ -43,6 +114,7 @@ class HomeService {
       required String author1,
       String? author2,
       String? author3,
+      required String image,
       required BuildContext context}) async {
     try {
       // Ambil data pengguna saat ini
@@ -58,11 +130,12 @@ class HomeService {
       Document doc = Document(
         id: docId, // Kosongkan id karena Firestore akan menghasilkan id otomatis
         title: title,
-        date: DateTime.now(),
+        date: DateTime.now().toString(),
         target: target,
         author1: author1,
         author2: author2,
         author3: author3,
+        image: image,
       );
 
       // Simpan dokumen baru ke koleksi 'Documents'

@@ -6,6 +6,9 @@ import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:jmo_sign/view/dashboard/document.dart';
 import 'package:jmo_sign/view/dashboard/home.dart';
 
+import '../../model/document.dart';
+import '../../service/auth/homeService.dart';
+
 class DashboardScreen extends StatefulWidget {
   final UserData userData;
 
@@ -25,7 +28,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
     final List<Widget> pages = [
       Homecreen(userData: widget.userData),
-      DocumentScreen(),
+      DocumentScreen(userData: widget.userData),
     ];
 
     return Scaffold(

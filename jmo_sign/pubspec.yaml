@@ -54,6 +54,7 @@ dependencies:
   syncfusion_flutter_pdfviewer:
   pdf_manipulator:
   image:
+  timelines_plus:
 
 dev_dependencies:
   flutter_test:
