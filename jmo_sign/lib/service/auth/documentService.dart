@@ -11,13 +11,11 @@ import '../../view/dashboard/dashboard.dart';
 class DocumentService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  // Fungsi untuk mengambil semua nama dari koleksi User
   Future<List<dynamic>> fetchDocument({required BuildContext context}) async {
     try {
       QuerySnapshot querySnapshot =
           await FirebaseFirestore.instance.collection('Document').get();
 
-      // Konversi hasil query menjadi list of Document
       List<Document> documentList = querySnapshot.docs.map((doc) {
         return Document(
           id: doc.id,
@@ -41,14 +39,14 @@ class DocumentService {
         },
       );
       print('Error fetching document : $e');
-      return []; // Mengembalikan array kosong jika terjadi error
+      return [];
     }
   }
 
   Future<void> updateDocument({
     required UserData userData,
     required BuildContext context,
-    required String documentId, // ID dari dokumen yang ingin diperbarui
+    required String documentId,
     required String target,
     required String author1,
     required String author2,
@@ -56,11 +54,9 @@ class DocumentService {
     required String image,
   }) async {
     try {
-      // Dapatkan referensi dokumen yang ingin diperbarui
       DocumentReference documentRef =
           FirebaseFirestore.instance.collection('Document').doc(documentId);
 
-      // Update data pada dokumen
       await documentRef.update({
         'target': target,
         'author_1': author1,
@@ -69,7 +65,6 @@ class DocumentService {
         'image': image,
       });
 
-      // Menampilkan dialog bahwa update berhasil
       showCustomAlertDialogOneDialog(
         context: context,
         title: 'Document Updated Successfully',
@@ -86,7 +81,6 @@ class DocumentService {
       );
       print('Document updated successfully');
     } catch (e) {
-      // Menampilkan error jika terjadi kesalahan saat update
       showCustomAlertDialogOneDialog(
         context: context,
         title: 'Error updating document: $e',

@@ -17,7 +17,6 @@ class HomeService {
     userid,
   ) async {
     try {
-      print(userid);
       DocumentSnapshot userDoc =
           await FirebaseFirestore.instance.collection('User').doc(userid).get();
 
@@ -28,7 +27,6 @@ class HomeService {
       int waitingForTheOthers = 0;
       int totalTask = 0;
 
-      // Iterasi setiap dokumen di koleksi
       for (var doc in querySnapshot.docs) {
         final documentData = doc.data() as Map<String, dynamic>;
 
@@ -37,12 +35,10 @@ class HomeService {
         final author2 = documentData['author_2'] ?? '';
         final author3 = documentData['author_3'] ?? '';
 
-        // Jika user adalah target, tambahkan ke needToSign
         if (target == userDoc['name']) {
           needToSign++;
         }
 
-        // Jika user bukan target, tapi dia adalah salah satu dari author
         if (target != "complete" &&
             target != userDoc['name'] &&
             (author1 == userDoc['name'] ||
@@ -51,7 +47,6 @@ class HomeService {
           waitingForTheOthers++;
         }
 
-        // Hitung total task (jika user ada di dokumen sebagai author atau target)
         totalTask = needToSign + waitingForTheOthers;
       }
 
@@ -78,13 +73,10 @@ class HomeService {
     }
   }
 
-  // Fungsi untuk mengambil semua nama dari koleksi User
   Future<List<String>> fetchUserNames({required BuildContext context}) async {
     try {
-      // Ambil data dari koleksi 'User'
       QuerySnapshot querySnapshot = await _firestore.collection('User').get();
 
-      // Ambil semua nama dari field 'name' di setiap dokumen
       List<String> names = querySnapshot.docs.map((doc) {
         return doc['name'] as String;
       }).toList();
@@ -99,7 +91,7 @@ class HomeService {
         },
       );
       print('Error fetching user names: $e');
-      return []; // Mengembalikan array kosong jika terjadi error
+      return [];
     }
   }
 
@@ -113,18 +105,15 @@ class HomeService {
       required String image,
       required BuildContext context}) async {
     try {
-      // Ambil data pengguna saat ini
       CollectionReference ref =
           FirebaseFirestore.instance.collection('Document');
 
       String docId = ref.doc().id;
 
-      // Ambil data pengguna dari koleksi 'User'
       await FirebaseFirestore.instance.collection('Document').doc(docId).get();
 
-      // Membuat Document baru dengan id otomatis dari Firestore
       Document doc = Document(
-        id: docId, // Kosongkan id karena Firestore akan menghasilkan id otomatis
+        id: docId,
         title: title,
         date: DateTime.now().toString(),
         target: target,
@@ -134,12 +123,10 @@ class HomeService {
         image: image,
       );
 
-      // Simpan dokumen baru ke koleksi 'Documents'
       DocumentReference docRef = await FirebaseFirestore.instance
           .collection('Document')
           .add(doc.toMap());
 
-      // Setelah dokumen disimpan, dapatkan id yang dihasilkan
       doc.id = docRef.id;
 
       print("Document submitted successfully. Document ID: ${doc.id}");

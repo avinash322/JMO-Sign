@@ -32,7 +32,6 @@ class AuthService {
         int waitingForTheOthers = 0;
         int totalTask = 0;
 
-        // Iterasi setiap dokumen di koleksi
         for (var doc in querySnapshot.docs) {
           final documentData = doc.data() as Map<String, dynamic>;
 
@@ -41,12 +40,10 @@ class AuthService {
           final author2 = documentData['author_2'] ?? '';
           final author3 = documentData['author_3'] ?? '';
 
-          // Jika user adalah target, tambahkan ke needToSign
           if (target == userDoc['name']) {
             needToSign++;
           }
 
-          // Jika user bukan target, tapi dia adalah salah satu dari author
           if (target != userDoc['name'] &&
               (author1 == userDoc['name'] ||
                   author2 == userDoc['name'] ||
@@ -54,7 +51,6 @@ class AuthService {
             waitingForTheOthers++;
           }
 
-          // Hitung total task (jika user ada di dokumen sebagai author atau target)
           if (target == userDoc['name'] ||
               author1 == userDoc['name'] ||
               author2 == userDoc['name'] ||
@@ -101,7 +97,6 @@ class AuthService {
         int waitingForTheOthers = 0;
         int totalTask = 0;
 
-        // Iterasi setiap dokumen di koleksi
         for (var doc in querySnapshot.docs) {
           final documentData = doc.data() as Map<String, dynamic>;
 
@@ -110,12 +105,10 @@ class AuthService {
           final author2 = documentData['author_2'] ?? '';
           final author3 = documentData['author_3'] ?? '';
 
-          // Jika user adalah target, tambahkan ke needToSign
           if (target == userDoc['name']) {
             needToSign++;
           }
 
-          // Jika user bukan target, tapi dia adalah salah satu dari author
           if (target != "complete" &&
               target != userDoc['name'] &&
               (author1 == userDoc['name'] ||
@@ -123,8 +116,6 @@ class AuthService {
                   author3 == userDoc['name'])) {
             waitingForTheOthers++;
           }
-
-          // Hitung total task (jika user ada di dokumen sebagai author atau target)
 
           totalTask = needToSign + waitingForTheOthers;
         }

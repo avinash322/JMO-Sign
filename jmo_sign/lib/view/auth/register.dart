@@ -56,13 +56,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
               Expanded(
                 flex: 1,
                 child: Container(
-                  color: Colors.green, // Setengah halaman warna hijau
+                  color: Colors.green,
                 ),
               ),
               Expanded(
                 flex: 1,
                 child: Container(
-                  color: Colors.white, // Setengah halaman warna putih
+                  color: Colors.white,
                 ),
               ),
             ],

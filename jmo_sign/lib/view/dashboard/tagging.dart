@@ -49,12 +49,10 @@ class _TaggingScreenState extends State<TaggingScreen> {
   static bool calculateDistance(LatLng p1, LatLng p2, double accuracy) {
     final Distance distance = new Distance();
     double calculatedDistance = distance.as(LengthUnit.Meter, p1, p2);
-    print("distance:" + calculatedDistance.toString());
     return accuracy > calculatedDistance;
   }
 
   void _setCheckin() async {
-    print("jalan");
     setState(() {
       _isLoading = true;
     });
@@ -435,36 +433,6 @@ class _TaggingScreenState extends State<TaggingScreen> {
             ? FlutterMap(
                 mapController: _mapController,
                 options: MapOptions(
-                  // onTap: (tapPosition, point) {
-                  //   setState(() {
-                  //     if (_markers.isNotEmpty) {
-                  //       setState(() {
-                  //         _markers.removeLast();
-                  //         _markers.add(
-                  //           Marker(
-                  //             point: point,
-                  //             child: const Icon(
-                  //               Icons.pin_drop,
-                  //               color: Colors.red,
-                  //               size: 40,
-                  //             ),
-                  //           ),
-                  //         );
-                  //       });
-                  //     } else {
-                  //       _markers.add(
-                  //         Marker(
-                  //           point: point,
-                  //           child: const Icon(
-                  //             Icons.pin_drop,
-                  //             color: Colors.red,
-                  //             size: 40,
-                  //           ),
-                  //         ),
-                  //       );
-                  //     }
-                  //   });
-                  // },
                   initialCenter: _defaultLocation,
                   initialZoom: 10,
                   minZoom: 0,
@@ -486,21 +454,6 @@ class _TaggingScreenState extends State<TaggingScreen> {
                   MarkerLayer(
                     markers: _markers,
                   ),
-                  // CurrentLocationLayer(
-                  //   followOnLocationUpdate: FollowOnLocationUpdate.always,
-                  //   turnOnHeadingUpdate: TurnOnHeadingUpdate.never,
-                  //   style: const LocationMarkerStyle(
-                  //     marker: DefaultLocationMarker(
-                  //       color: Colors.white,
-                  //       child: Icon(
-                  //         Icons.navigation_outlined,
-                  //         color: Colors.blue,
-                  //       ),
-                  //     ),
-                  //     markerSize: Size(40, 40),
-                  //     markerDirection: MarkerDirection.heading,
-                  //   ),
-                  // ),
                 ],
               )
             : Container());

@@ -4,11 +4,10 @@ class Document {
   String date;
   String target;
   String author1;
-  String? author2; // Optional author 2
+  String? author2;
   String? author3;
-  String image; // Optional author 3
+  String image;
 
-  // Constructor
   Document({
     required this.id,
     required this.title,
@@ -20,12 +19,11 @@ class Document {
     required this.image,
   });
 
-  // Method to convert Document to Map (for Firestore or other DB)
   Map<String, dynamic> toMap() {
     return {
       'id': id,
       'title': title,
-      'date': date, // converting DateTime to string
+      'date': date,
       'target': target,
       'author_1': author1,
       'author_2': author2,
@@ -34,7 +32,6 @@ class Document {
     };
   }
 
-  // Method to create Document from Map (for Firestore or other DB)
   factory Document.fromMap(Map<String, dynamic> map) {
     return Document(
       id: map['id'] ?? '',
@@ -42,8 +39,8 @@ class Document {
       date: map['date'] ?? "",
       target: map['target'] ?? '',
       author1: map['author_1'] ?? '',
-      author2: map['author_2'], // can be null
-      author3: map['author_3'], // can be null
+      author2: map['author_2'],
+      author3: map['author_3'],
       image: map["image"] ?? "",
     );
   }

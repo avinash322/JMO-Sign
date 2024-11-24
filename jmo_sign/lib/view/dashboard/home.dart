@@ -74,17 +74,14 @@ class _HomeScreenState extends State<Homecreen> {
   }
 
   Future<void> fetchUserTask() async {
-    // Menunggu hasil dari _homeService.refreshProfile
     UserData? updatedUserData =
         await _homeService.refreshTask(context, widget.userData.id);
 
-    // Pastikan updatedUserData tidak null sebelum mengupdate
     if (updatedUserData != null) {
       setState(() {
-        _userData = updatedUserData; // Mengupdate widget.userData
+        _userData = updatedUserData;
       });
     } else {
-      // Tindakan jika userData yang diperoleh adalah null
       print("Gagal mendapatkan data pengguna.");
     }
   }
@@ -121,8 +118,7 @@ class _HomeScreenState extends State<Homecreen> {
     showModalBottomSheet(
       showDragHandle: true,
       context: context,
-      isScrollControlled:
-          true, // Agar modal bisa menggunakan seluruh layar jika perlu
+      isScrollControlled: true,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -130,8 +126,7 @@ class _HomeScreenState extends State<Homecreen> {
         return StatefulBuilder(
           builder: (BuildContext context, setModalState) {
             return Container(
-              height: MediaQuery.of(context).size.height *
-                  0.8, // Sesuaikan dengan ukuran layar
+              height: MediaQuery.of(context).size.height * 0.8,
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Form(
@@ -155,20 +150,16 @@ class _HomeScreenState extends State<Homecreen> {
                         keyboardType: TextInputType.text,
                       ),
                       SizedBox(height: 10),
-                      // Checkbox untuk memilih apakah akan kirim ke orang lain
                       CheckboxListTile(
                         title: Text('Kirim ke orang lain juga?'),
                         value: isChecked,
                         onChanged: (bool? value) {
-                          // Gunakan setModalState untuk memperbarui status di dalam modal
                           setModalState(() {
                             isChecked = value ?? false;
                           });
                         },
                       ),
                       SizedBox(height: 10),
-
-                      // Dropdown hanya muncul jika checkbox dicentang
                       isChecked
                           ? Column(
                               children: [
@@ -188,7 +179,6 @@ class _HomeScreenState extends State<Homecreen> {
                                       jumlahauthor = newValue;
                                       selectedauthor1 = null;
                                       selectedauthor2 = null;
-                                      // Update nilai dropdown
                                     });
                                   },
                                   items: [
@@ -198,8 +188,7 @@ class _HomeScreenState extends State<Homecreen> {
                                       (String value) {
                                     return DropdownMenuItem<String>(
                                       value: value,
-                                      child: Text(
-                                          value), // Tampilkan nama pengguna
+                                      child: Text(value),
                                     );
                                   }).toList(),
                                 ),
@@ -227,8 +216,7 @@ class _HomeScreenState extends State<Homecreen> {
                                             (String value) {
                                       return DropdownMenuItem<String>(
                                         value: value,
-                                        child: Text(
-                                            value), // Tampilkan nama pengguna
+                                        child: Text(value),
                                       );
                                     }).toList(),
                                   ),
@@ -245,8 +233,7 @@ class _HomeScreenState extends State<Homecreen> {
                                     value: selectedauthor1,
                                     onChanged: (String? newValue) {
                                       setModalState(() {
-                                        selectedauthor1 =
-                                            newValue; // Update nilai dropdown
+                                        selectedauthor1 = newValue;
                                       });
                                     },
                                     items: userNamesList
@@ -257,8 +244,7 @@ class _HomeScreenState extends State<Homecreen> {
                                             (String value) {
                                       return DropdownMenuItem<String>(
                                         value: value,
-                                        child: Text(
-                                            value), // Tampilkan nama pengguna
+                                        child: Text(value),
                                       );
                                     }).toList(),
                                   ),
@@ -275,8 +261,7 @@ class _HomeScreenState extends State<Homecreen> {
                                     value: selectedauthor2,
                                     onChanged: (String? newValue) {
                                       setModalState(() {
-                                        selectedauthor2 =
-                                            newValue; // Update nilai dropdown
+                                        selectedauthor2 = newValue;
                                       });
                                     },
                                     items: userNamesList
@@ -287,8 +272,7 @@ class _HomeScreenState extends State<Homecreen> {
                                             (String value) {
                                       return DropdownMenuItem<String>(
                                         value: value,
-                                        child: Text(
-                                            value), // Tampilkan nama pengguna
+                                        child: Text(value),
                                       );
                                     }).toList(),
                                   ),
@@ -305,7 +289,7 @@ class _HomeScreenState extends State<Homecreen> {
                           } else {}
                         },
                         color: Colors.green,
-                      ), // Jika checkbox tidak dicentang, tidak menampilkan dropdown
+                      ),
                       SizedBox(height: 50),
                     ],
                   ),
@@ -316,7 +300,6 @@ class _HomeScreenState extends State<Homecreen> {
         );
       },
     ).whenComplete(() {
-      // Reset semua nilai variabel saat modal ditutup
       setState(() {
         titleController.text = "";
         jumlahauthor = null;
@@ -444,13 +427,13 @@ class _HomeScreenState extends State<Homecreen> {
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
-                      Color(0xFF009E60), // Hijau
-                      Color(0xFF9FE2BF), // Putih
+                      Color(0xFF009E60),
+                      Color(0xFF9FE2BF),
                     ],
-                    begin: Alignment.topLeft, // Mulai dari pojok kiri atas
-                    end: Alignment.bottomRight, // Berakhir di pojok kanan bawah
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
                   ),
-                  borderRadius: BorderRadius.circular(20), // Sudut melengkung
+                  borderRadius: BorderRadius.circular(20),
                 ),
                 child: Glassmorphism(
                   opacity: 0.3,
@@ -638,12 +621,11 @@ class _HomeScreenState extends State<Homecreen> {
                       borderRadius: BorderRadius.circular(30),
                       gradient: LinearGradient(
                         colors: [
-                          Color(0xFFE35335), // Hijau
-                          Color(0xFFF88379), // Putih
+                          Color(0xFFE35335),
+                          Color(0xFFF88379),
                         ],
-                        begin: Alignment.topLeft, // Mulai dari pojok kiri atas
-                        end: Alignment
-                            .bottomRight, // Berakhir di pojok kanan bawah
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
                       ),
                     ),
                     child: Padding(
@@ -809,10 +791,10 @@ class _HomeScreenState extends State<Homecreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: showCustomModal,
-        backgroundColor: Color(0xFF4682B4), // Warna latar belakang biru
+        backgroundColor: Color(0xFF4682B4),
         child: Icon(
-          Icons.add, // Ikon plus
-          color: Colors.white, // Warna ikon putih
+          Icons.add,
+          color: Colors.white,
         ),
       ),
     );

@@ -2,20 +2,19 @@ class UserData {
   final String id;
   final String name;
   final String email;
-  final int totalTask; // Jumlah total tugas yang dimiliki user
-  final int needToSign; // Jumlah dokumen yang perlu ditandatangani user
-  final int waitingForTheOthers; // Jumlah dokumen yang menunggu orang lain
+  final int totalTask;
+  final int needToSign;
+  final int waitingForTheOthers;
 
   UserData({
     required this.id,
     required this.name,
     required this.email,
-    this.totalTask = 0, // Nilai default
-    this.needToSign = 0, // Nilai default
-    this.waitingForTheOthers = 0, // Nilai default
+    this.totalTask = 0,
+    this.needToSign = 0,
+    this.waitingForTheOthers = 0,
   });
 
-  // Konversi ke Map
   Map<String, dynamic> toMap() {
     return {
       'id': id,
@@ -27,7 +26,6 @@ class UserData {
     };
   }
 
-  // Membaca data dari Map
   factory UserData.fromMap(Map<String, dynamic> map) {
     return UserData(
       id: map['id'] ?? '',

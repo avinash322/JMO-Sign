@@ -7,17 +7,17 @@ import 'package:flutter/material.dart';
 import 'package:image/image.dart' as img;
 import 'package:pdf_manipulator/pdf_manipulator.dart';
 import 'package:signature/signature.dart';
-import 'dart:typed_data'; // Import untuk Uint8List
-import 'package:pdf/widgets.dart' as pw; // Import untuk membuat PDF
+import 'dart:typed_data';
+import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 
 import '../model/document.dart';
 import '../model/user.dart';
-import 'PDF_Viewer.dart'; // Import untuk menampilkan atau mencetak PDF
+import 'PDF_Viewer.dart';
 
 class SignatureModal extends StatefulWidget {
-  final Function(Uint8List?) onConfirm; // Callback untuk OK
-  final VoidCallback? onCancel; // Callback untuk Cancel (opsional)
+  final Function(Uint8List?) onConfirm;
+  final VoidCallback? onCancel;
   final UserData userData;
   final Document documentData;
 
@@ -42,10 +42,8 @@ class _SignatureModalState extends State<SignatureModal> {
   late String combinedBase64;
 
   Future<void> _showPDFPreview(Uint8List signature) async {
-    // Buat dokumen PDF
     final pdf = pw.Document();
 
-    // Menambahkan gambar ke dalam PDF
     pdf.addPage(
       pw.Page(
         build: (pw.Context context) {
@@ -58,34 +56,27 @@ class _SignatureModalState extends State<SignatureModal> {
       ),
     );
 
-    // Panggil generateAndNavigate untuk navigasi setelah PDF selesai dibuat
     generateAndNavigate(context, pdf, signature);
   }
 
   Future<void> generateAndNavigate(
       BuildContext context, pw.Document pdf, Uint8List signature) async {
     final pdfBytes = await pdf.save();
-    final pdfBase64 = base64Encode(pdfBytes); // Base64 dari PDF
+    final pdfBase64 = base64Encode(pdfBytes);
     var signatureimg = signature;
 
-    // Kondisi jika ada lebih dari satu gambar (signatures)
-    String finalPdfBase64 = pdfBase64; // Default jika hanya satu gambar
+    String finalPdfBase64 = pdfBase64;
 
-    // Misalnya, jika ada lebih dari satu gambar
     if (widget.documentData.target == widget.documentData.author2 ||
         widget.documentData.target == widget.documentData.author3) {
-      // Gabungkan gambar menjadi satu PDF baru
       String combinedBase64 = await combineImagesToBase64(
         widget.documentData.image,
-        base64Encode(signature), // Gantilah dengan base64 gambar yang sesuai
+        base64Encode(signature),
       );
       signatureimg = base64Decode(combinedBase64);
 
-      // Gabungkan gambar-gambar tersebut dalam PDF baru
-
       final pdf = pw.Document();
 
-      // Menambahkan gambar ke dalam PDF
       pdf.addPage(
         pw.Page(
           build: (pw.Context context) {
@@ -102,7 +93,6 @@ class _SignatureModalState extends State<SignatureModal> {
       finalPdfBase64 = pdfBase64;
     }
 
-    // Navigasi ke PDFScreen dengan base64 dari PDF yang sudah diproses
     if (mounted) {
       Navigator.push(
         context,
@@ -126,7 +116,6 @@ class _SignatureModalState extends State<SignatureModal> {
     Uint8List bytes1 = base64Decode(base64Image1);
     Uint8List bytes2 = base64Decode(base64Image2);
 
-    // Decode gambar dari byte array
     ui.Image image1 = await decodeImageFromList(bytes1);
     ui.Image image2 = await decodeImageFromList(bytes2);
 
@@ -136,16 +125,13 @@ class _SignatureModalState extends State<SignatureModal> {
     double width = image1.width.toDouble();
     double height = image1.height.toDouble() + image2.height.toDouble();
 
-    // Gambar pertama
     canvas.drawImage(image1, Offset(0, 0), Paint());
 
-    // Gambar kedua ditempatkan setelah gambar pertama
     canvas.drawImage(image2, Offset(0, image1.height.toDouble()), Paint());
 
     final picture = recorder.endRecording();
     final combinedImage = await picture.toImage(width.toInt(), height.toInt());
 
-    // Convert combined image to base64
     final base64Image = await imageToBase64(combinedImage);
     return base64Image;
   }
@@ -177,7 +163,7 @@ class _SignatureModalState extends State<SignatureModal> {
             children: [
               ElevatedButton(
                 onPressed: () {
-                  _signatureController.clear(); // Reset tanda tangan
+                  _signatureController.clear();
                 },
                 child: const Text("Reset"),
                 style: ElevatedButton.styleFrom(primary: Colors.red),
@@ -189,7 +175,6 @@ class _SignatureModalState extends State<SignatureModal> {
                         await _signatureController.toPngBytes();
                     widget.onConfirm(signatureData);
 
-                    // Tampilkan preview PDF
                     await _showPDFPreview(signatureData!);
                   } else {
                     widget.onConfirm(null);

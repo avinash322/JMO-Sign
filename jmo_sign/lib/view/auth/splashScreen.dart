@@ -20,17 +20,13 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   void _navigateToDashboard() async {
-    // Simulasi waktu loading
     await Future.delayed(const Duration(seconds: 3));
 
-    // Mengecek status login dengan Firebase Authentication
     User? user = FirebaseAuth.instance.currentUser;
 
     if (user != null) {
-      // Jika pengguna sudah login, arahkan ke DashboardScreen
       _authService.AutoLogin(user, context);
     } else {
-      // Jika pengguna belum login, arahkan ke LoginScreen
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
@@ -43,19 +39,17 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF478778), // Warna latar belakang
+      backgroundColor: const Color(0xFF478778),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // Logo atau Gambar
             Image.asset(
-              'assets/logo.jpg', // Tambahkan logo Anda di folder assets
+              'assets/logo.jpg',
               height: 150,
               width: 150,
             ),
             const SizedBox(height: 20),
-            // Teks
             const Text(
               'JMO Sign',
               style: TextStyle(
@@ -65,7 +59,6 @@ class _SplashScreenState extends State<SplashScreen> {
               ),
             ),
             const SizedBox(height: 20),
-            // Circular Progress Indicator
             const CircularProgressIndicator(
               valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
             ),

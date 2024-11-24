@@ -8,7 +8,7 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:jmo_sign/service/auth/documentService.dart';
 import 'package:sidebarx/sidebarx.dart';
-import 'package:pdf/widgets.dart' as pw; // Import untuk membuat PDF
+import 'package:pdf/widgets.dart' as pw;
 
 import '../../component/PDF_Viewer.dart';
 import '../../component/signingModal.dart';
@@ -43,11 +43,11 @@ class _DocumentScreenState extends State<DocumentScreen> {
           documentData: documentData,
           onConfirm: (signatureData) {
             setState(() {
-              _signatureImage = signatureData; // Simpan tanda tangan
+              _signatureImage = signatureData;
             });
           },
           onCancel: () {
-            Navigator.of(context).pop(); // Opsional, bisa untuk cancel action
+            Navigator.of(context).pop();
           },
         );
       },
@@ -65,12 +65,10 @@ class _DocumentScreenState extends State<DocumentScreen> {
   }
 
   void showCustomModal(BuildContext context, dynamic document) {
-    // Sample data based on the document object (you can adjust it according to your actual data)
-
     showModalBottomSheet(
       showDragHandle: true,
       context: context,
-      isScrollControlled: true, // To make the modal full screen if necessary
+      isScrollControlled: true,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -106,7 +104,7 @@ class _DocumentScreenState extends State<DocumentScreen> {
                   )),
               Container(
                 width: 2,
-                height: 40, // Adjust height based on how far you want the line
+                height: 40,
                 color: Colors.amber,
               ),
               document.target == document.author2
@@ -117,7 +115,7 @@ class _DocumentScreenState extends State<DocumentScreen> {
                           color: Color(0xFF87CEEB),
                           size: 30,
                         ),
-                        Text("Waiting for Author 2 Signing",
+                        Text("Waiting for ${document.author2} Signing",
                             style: GoogleFonts.poppins(
                               textStyle: TextStyle(
                                 color: Colors.black,
@@ -148,8 +146,7 @@ class _DocumentScreenState extends State<DocumentScreen> {
                                 )),
                             Container(
                               width: 2,
-                              height:
-                                  40, // Adjust height based on how far you want the line
+                              height: 40,
                               color: Color(0xFF87CEEB),
                             ),
                             const SizedBox(height: 5),
@@ -157,7 +154,7 @@ class _DocumentScreenState extends State<DocumentScreen> {
                               color: Color(0xFF9FE2BF),
                               size: 30,
                             ),
-                            Text("Waiting for Author 3 Signing",
+                            Text("Waiting for ${document.author3} Signing",
                                 style: GoogleFonts.poppins(
                                   textStyle: TextStyle(
                                     color: Colors.black,
@@ -176,18 +173,15 @@ class _DocumentScreenState extends State<DocumentScreen> {
   }
 
   Future<String> convertImageToPdfBase64(String base64Image) async {
-    // Dekode Base64 menjadi Uint8List
     Uint8List imageBytes = base64Decode(base64Image);
 
-    // Buat dokumen PDF
     final pdf = pw.Document();
 
-    // Menambahkan gambar ke dalam PDF
     pdf.addPage(
       pw.Page(
         build: (pw.Context context) {
           return pw.Image(
-            pw.MemoryImage(imageBytes), // Menggunakan gambar dari Base64
+            pw.MemoryImage(imageBytes),
             width: 500,
             height: 500,
           );
@@ -195,16 +189,13 @@ class _DocumentScreenState extends State<DocumentScreen> {
       ),
     );
 
-    // Simpan PDF dan konversi menjadi Base64
     final pdfBytes = await pdf.save();
-    return base64Encode(pdfBytes); // Kembalikan hasil Base64 dari PDF
+    return base64Encode(pdfBytes);
   }
 
   void navigateToPDFScreen(BuildContext context, Document document) async {
-    // Proses document.image menjadi PDF Base64
     final pdfBase64 = await convertImageToPdfBase64(document.image);
 
-    // Navigasi ke PDFScreen dengan hasil PDF Base64
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -231,7 +222,6 @@ class _DocumentScreenState extends State<DocumentScreen> {
     double screenWidth = MediaQuery.of(context).size.width;
     return Row(
       children: [
-        // SidebarX di kiri dengan icon yang berada di tengah
         SidebarX(
           theme: SidebarXTheme(
               selectedIconTheme: IconThemeData(
@@ -244,11 +234,10 @@ class _DocumentScreenState extends State<DocumentScreen> {
                 gradient: LinearGradient(
                   colors: [
                     Color(0xFF9FE2BF),
-                    Color(0xFF478778), // Hijau
-                    // Putih
+                    Color(0xFF478778),
                   ],
-                  begin: Alignment.topLeft, // Mulai dari pojok kiri atas
-                  end: Alignment.bottomRight, // Berakhir di pojok kanan bawah
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
                 ),
               )),
           showToggleButton: false,
@@ -280,17 +269,14 @@ class _DocumentScreenState extends State<DocumentScreen> {
             ),
           ],
         ),
-
         tabstatus == "signing"
             ? Expanded(
-                flex: 4, // Konten utama akan mengambil lebih banyak ruang
+                flex: 4,
                 child: Center(
                   child: Padding(
                     padding: const EdgeInsets.only(top: 50),
                     child: FutureBuilder<List<dynamic>>(
-                      future: _documentService.fetchDocument(
-                          context:
-                              context), // Ganti dengan method fetch yang sesuai
+                      future: _documentService.fetchDocument(context: context),
                       builder: (context, snapshot) {
                         if (snapshot.connectionState ==
                             ConnectionState.waiting) {
@@ -306,7 +292,7 @@ class _DocumentScreenState extends State<DocumentScreen> {
                                       fontSize: 30,
                                       fontWeight: FontWeight.bold,
                                     ),
-                                  ))); // Menampilkan error jika terjadi
+                                  )));
                         }
 
                         if (!snapshot.hasData || snapshot.data!.isEmpty) {
@@ -321,10 +307,9 @@ class _DocumentScreenState extends State<DocumentScreen> {
                                 ),
                               ),
                             ),
-                          ); // Menangani jika data kosong
+                          );
                         }
 
-                        // Filter data berdasarkan target
                         List filteredDocuments = snapshot.data!
                             .where((document) =>
                                 document.target == widget.userData.name)
@@ -354,13 +339,11 @@ class _DocumentScreenState extends State<DocumentScreen> {
                                         color: Colors.black,
                                         fontSize: 30,
                                         fontWeight: FontWeight.bold))),
-
-                            // Card pertama atau item yang diambil dari Firestore
                             ...filteredDocuments.map((document) {
                               return GestureDetector(
                                 onTap: () {
                                   _showSignatureModal(document);
-                                }, // Fungsi untuk menampilkan modal
+                                },
                                 child: Card(
                                   elevation: 4,
                                   color: Color(0xFFF0E68C),
@@ -380,9 +363,7 @@ class _DocumentScreenState extends State<DocumentScreen> {
                                             crossAxisAlignment:
                                                 CrossAxisAlignment.start,
                                             children: [
-                                              Text(
-                                                  document
-                                                      .title, // Tampilkan title dokumen
+                                              Text(document.title,
                                                   style: GoogleFonts.poppins(
                                                     textStyle: TextStyle(
                                                       color: Colors.black,
@@ -425,20 +406,17 @@ class _DocumentScreenState extends State<DocumentScreen> {
               )
             : tabstatus == "waiting"
                 ? Expanded(
-                    flex: 4, // Konten utama akan mengambil lebih banyak ruang
+                    flex: 4,
                     child: Center(
                       child: Padding(
                         padding: const EdgeInsets.only(top: 50),
                         child: FutureBuilder<List<dynamic>>(
-                          future: _documentService.fetchDocument(
-                              context:
-                                  context), // Ganti dengan metode fetch data Anda
+                          future:
+                              _documentService.fetchDocument(context: context),
                           builder: (context, snapshot) {
                             if (snapshot.connectionState ==
                                 ConnectionState.waiting) {
-                              return Center(
-                                  child:
-                                      CircularProgressIndicator()); // Loading saat data sedang diambil
+                              return Center(child: CircularProgressIndicator());
                             }
 
                             if (snapshot.hasError) {
@@ -450,7 +428,7 @@ class _DocumentScreenState extends State<DocumentScreen> {
                                           fontSize: 30,
                                           fontWeight: FontWeight.bold,
                                         ),
-                                      ))); // Menampilkan error jika terjadi
+                                      )));
                             }
 
                             if (!snapshot.hasData || snapshot.data!.isEmpty) {
@@ -468,10 +446,13 @@ class _DocumentScreenState extends State<DocumentScreen> {
                               );
                             }
 
-                            // Filter data berdasarkan target
                             List filteredDocuments = snapshot.data!
                                 .where((document) =>
-                                    document.target != widget.userData.name &&
+                                    (document.author1 == widget.userData.name ||
+                                        document.author2 ==
+                                            widget.userData.name ||
+                                        document.author3 ==
+                                            widget.userData.name) &&
                                     document.target != "complete")
                                 .toList();
 
@@ -503,7 +484,6 @@ class _DocumentScreenState extends State<DocumentScreen> {
                                     ),
                                   ),
                                 ),
-                                // Tampilkan daftar dokumen
                                 ...filteredDocuments.map((document) {
                                   return Card(
                                     elevation: 4,
@@ -524,9 +504,7 @@ class _DocumentScreenState extends State<DocumentScreen> {
                                               crossAxisAlignment:
                                                   CrossAxisAlignment.start,
                                               children: [
-                                                Text(
-                                                    document
-                                                        .title, // Tampilkan title dokumen
+                                                Text(document.title,
                                                     style: GoogleFonts.poppins(
                                                       textStyle: TextStyle(
                                                         color: Colors.black,
@@ -573,20 +551,17 @@ class _DocumentScreenState extends State<DocumentScreen> {
                     ),
                   )
                 : Expanded(
-                    flex: 4, // Konten utama akan mengambil lebih banyak ruang
+                    flex: 4,
                     child: Center(
                       child: Padding(
                         padding: const EdgeInsets.only(top: 50),
                         child: FutureBuilder<List<dynamic>>(
-                          future: _documentService.fetchDocument(
-                              context:
-                                  context), // Ganti dengan metode fetch data Anda
+                          future:
+                              _documentService.fetchDocument(context: context),
                           builder: (context, snapshot) {
                             if (snapshot.connectionState ==
                                 ConnectionState.waiting) {
-                              return Center(
-                                  child:
-                                      CircularProgressIndicator()); // Loading saat data sedang diambil
+                              return Center(child: CircularProgressIndicator());
                             }
 
                             if (snapshot.hasError) {
@@ -597,7 +572,7 @@ class _DocumentScreenState extends State<DocumentScreen> {
                                         color: Colors.black,
                                         fontSize: 30,
                                         fontWeight: FontWeight.bold,
-                                      )))); // Menampilkan error jika terjadi
+                                      ))));
                             }
 
                             if (!snapshot.hasData || snapshot.data!.isEmpty) {
@@ -615,10 +590,14 @@ class _DocumentScreenState extends State<DocumentScreen> {
                               );
                             }
 
-                            // Filter data berdasarkan target
                             List filteredDocuments = snapshot.data!
-                                .where(
-                                    (document) => document.target == "complete")
+                                .where((document) =>
+                                    (document.author1 == widget.userData.name ||
+                                        document.author2 ==
+                                            widget.userData.name ||
+                                        document.author3 ==
+                                            widget.userData.name) &&
+                                    document.target == "complete")
                                 .toList();
 
                             if (filteredDocuments.isEmpty) {
@@ -649,7 +628,6 @@ class _DocumentScreenState extends State<DocumentScreen> {
                                     ),
                                   ),
                                 ),
-                                // Tampilkan daftar dokumen
                                 ...filteredDocuments.map((document) {
                                   return Card(
                                     elevation: 4,
@@ -670,9 +648,7 @@ class _DocumentScreenState extends State<DocumentScreen> {
                                               crossAxisAlignment:
                                                   CrossAxisAlignment.start,
                                               children: [
-                                                Text(
-                                                    document
-                                                        .title, // Tampilkan title dokumen
+                                                Text(document.title,
                                                     style: GoogleFonts.poppins(
                                                       textStyle: TextStyle(
                                                         color: Colors.black,

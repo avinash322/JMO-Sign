@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 class CircularProgressDashboard extends StatelessWidget {
-  // Nilai progres (misalnya 0.5 untuk 50%)
-  final int number; // Angka yang ingin ditampilkan di dalam lingkaran
+  final int number;
 
   const CircularProgressDashboard({
     Key? key,
@@ -14,14 +13,14 @@ class CircularProgressDashboard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: Container(
-        width: 150, // Pastikan ukuran cukup besar
-        height: 150, // Pastikan ukuran cukup besar
+        width: 150,
+        height: 150,
         child: Stack(
           alignment: Alignment.center,
           children: [
             SizedBox(
-              width: 100, // Ukuran lebih besar
-              height: 100, // Ukuran lebih besar
+              width: 100,
+              height: 100,
               child: CircularProgressIndicator(
                 value: 0.85,
                 strokeWidth: 8.0,
