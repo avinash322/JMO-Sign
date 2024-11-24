@@ -74,7 +74,7 @@ class _DocumentScreenState extends State<DocumentScreen> {
       ),
       builder: (BuildContext context) {
         return Container(
-          height: 350,
+          height: 500,
           padding: EdgeInsets.all(16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -111,6 +111,26 @@ class _DocumentScreenState extends State<DocumentScreen> {
                   ? Column(
                       children: [
                         const SizedBox(height: 5),
+                        Container(
+                          width: 30,
+                          height: 30,
+                          decoration: BoxDecoration(
+                              shape: BoxShape.circle, color: Color(0xFFF88379)),
+                        ),
+                        Text("${document.author1} Done Signing",
+                            style: GoogleFonts.poppins(
+                              textStyle: TextStyle(
+                                color: Colors.black,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            )),
+                        Container(
+                          width: 2,
+                          height: 40,
+                          color: Color(0xFFF88379),
+                        ),
+                        const SizedBox(height: 5),
                         SpinKitRing(
                           color: Color(0xFF87CEEB),
                           size: 30,
@@ -134,9 +154,30 @@ class _DocumentScreenState extends State<DocumentScreen> {
                               height: 30,
                               decoration: BoxDecoration(
                                   shape: BoxShape.circle,
+                                  color: Color(0xFFF88379)),
+                            ),
+                            Text("${document.author1} Done Signing",
+                                style: GoogleFonts.poppins(
+                                  textStyle: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                )),
+                            Container(
+                              width: 2,
+                              height: 40,
+                              color: Color(0xFFF88379),
+                            ),
+                            const SizedBox(height: 5),
+                            Container(
+                              width: 30,
+                              height: 30,
+                              decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
                                   color: Color(0xFF87CEEB)),
                             ),
-                            Text("Author 2 Done Signing",
+                            Text("${document.author2} Done Signing",
                                 style: GoogleFonts.poppins(
                                   textStyle: TextStyle(
                                     color: Colors.black,
